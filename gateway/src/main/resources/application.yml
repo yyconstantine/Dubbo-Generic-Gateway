@@ -1,0 +1,23 @@
+server:
+  port: 9999
+
+spring:
+  application:
+    name: gateway
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@127.0.0.1:1521:user
+    username: root
+    password: 123456
+
+mybatis:
+  configuration:
+    use-actual-param-name: false
+
+registry:
+  address: zookeeper://127.0.0.1:2181
+
+rsa:
+  key:
+    private:
