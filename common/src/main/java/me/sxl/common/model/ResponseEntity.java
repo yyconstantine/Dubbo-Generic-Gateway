@@ -1,6 +1,5 @@
 package me.sxl.common.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import me.sxl.common.constant.ErrorEnum;
@@ -8,7 +7,6 @@ import me.sxl.common.constant.OkEnum;
 
 @Data
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResponseEntity<T> {
 
     private int code;

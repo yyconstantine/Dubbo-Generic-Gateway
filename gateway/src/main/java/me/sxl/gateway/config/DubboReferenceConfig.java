@@ -40,7 +40,7 @@ public class DubboReferenceConfig {
     /**
      * 将所有接口信息初始化在内存中,并暴露get方法获取
      */
-    private Map<DubboReferenceKey, DubboReferenceValue> config = new HashMap<>();
+    private static Map<DubboReferenceKey, DubboReferenceValue> config = new HashMap<>();
 
     @PostConstruct
     public void init() {

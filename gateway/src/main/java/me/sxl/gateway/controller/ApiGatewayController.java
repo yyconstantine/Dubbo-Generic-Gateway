@@ -1,5 +1,6 @@
 package me.sxl.gateway.controller;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +65,9 @@ public class ApiGatewayController {
         ReferenceConfigCache cache = ReferenceConfigCache.getCache();
         GenericService genericService = cache.get(config.getReference());
 
-        Object result;
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        String result = "";
 
         if (StringUtils.isEmpty(config.getModel().getInterfaceMethodSign())) {
             // 当不设置方法签名时,默认其只有一个String类型的参数
@@ -73,9 +76,13 @@ public class ApiGatewayController {
                 params[0] = map.get(key);
             }
 
-            result = genericService.$invoke(config.getModel().getInterfaceClass(),
-                                            new String[] {params[0].getClass().getName()},
-                                            params);
+            try {
+                result = objectMapper.writeValueAsString(genericService.$invoke(config.getModel().getInterfaceClass(),
+                        new String[] {params[0].getClass().getName()},
+                        params));
+            } catch (JsonProcessingException e) {
+                log.error("Jackson反序列化出错", e);
+            }
             log.info("Single parameter invoke return: {}", result);
         } else {
             // 遵循阿里开发规范,当两个参数及以上时封装为pojo,pojo全路径记录在数据库中
@@ -86,13 +93,17 @@ public class ApiGatewayController {
                 params.put(key, map.get(key));
             }
 
-            result = genericService.$invoke(config.getModel().getInterfaceClass(),
-                                            parameterTypes,
-                                            new Object[] {params});
+            try {
+                result = objectMapper.writeValueAsString(genericService.$invoke(config.getModel().getInterfaceClass(),
+                        parameterTypes,
+                        new Object[] {params}));
+            } catch (JsonProcessingException e) {
+                log.error("Jackson反序列化出错", e);
+            }
             log.info("Multi parameters invoke return: {}", result);
         }
 
-        String resultByDes = DESUtil.encrypt(result.toString(), desKey);
+        String resultByDes = DESUtil.encrypt(result, desKey);
 
         return ResponseEntity.ok(OkEnum.GLOBAL_SEARCH_OK, resultByDes);
     }
