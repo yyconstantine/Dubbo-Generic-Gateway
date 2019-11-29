@@ -7,6 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum  ErrorEnum {
 
+    METHOD_NOT_SUPPORT(405, "请求方法不支持"),
+    UNKNOWN(500, "系统内部错误"),
+
     GLOBAL_SEARCH_ERROR(1001, "搜索结果出错"),
     GLOBAL_INSERT_ERROR(1002, "新增失败"),
     GLOBAL_UPDATE_ERROR(1003, "修改失败"),

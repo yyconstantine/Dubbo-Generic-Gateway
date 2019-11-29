@@ -27,6 +27,10 @@ public class ResponseEntity<T> {
         return new ResponseEntity<>(okEnum.getCode(), okEnum.getMsg(), data);
     }
 
+    public static <T> ResponseEntity<T> error(int code, String msg) {
+        return new ResponseEntity<>(code, msg, null);
+    }
+
     public static <T> ResponseEntity<T> error(int code, String msg, T data) {
         return new ResponseEntity<>(code, msg, data);
     }

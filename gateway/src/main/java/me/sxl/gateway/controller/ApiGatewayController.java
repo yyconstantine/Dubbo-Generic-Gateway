@@ -1,6 +1,5 @@
 package me.sxl.gateway.controller;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -12,13 +11,16 @@ import me.sxl.gateway.config.DubboReferenceConfig;
 import me.sxl.gateway.model.ApiGatewayDTO;
 import me.sxl.gateway.model.DubboReferenceKey;
 import me.sxl.gateway.model.DubboReferenceValue;
-import me.sxl.gateway.util.RequestDecodeUtil;
+import me.sxl.gateway.util.RequestUtil;
+import me.sxl.gateway.util.ResponseUtil;
 import org.apache.dubbo.config.utils.ReferenceConfigCache;
 import org.apache.dubbo.rpc.service.GenericService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,12 +36,15 @@ public class ApiGatewayController {
     @SuppressWarnings("unchecked")
     public ResponseEntity route(@PathVariable String method,
                                 @PathVariable String uri,
-                                @RequestBody ApiGatewayDTO gatewayDTO) {
+                                @RequestBody ApiGatewayDTO gatewayDTO,
+                                HttpServletRequest request) {
         log.info("上传参数: method >> {}, uri >> {}, DTO >> {}", method, uri, gatewayDTO);
         // 这里做解密过程
-        String[] paramsAndDesKey = RequestDecodeUtil.decode2ParamsAndDesKey(gatewayDTO, privateKey);
+        String[] paramsAndDesKey = RequestUtil.decode2ParamsAndDesKey(gatewayDTO, privateKey);
         String reqParams = paramsAndDesKey[0];
         String desKey = paramsAndDesKey[1];
+
+        request.setAttribute("DES_KEY", desKey);
 
         if (StringUtils.isEmpty(reqParams) || StringUtils.isEmpty(desKey)) {
             log.error("参数解析错误");
@@ -57,16 +62,14 @@ public class ApiGatewayController {
         }
 
         DubboReferenceValue config = DubboReferenceConfig.get(DubboReferenceKey
-                                                        .builder()
-                                                        .reqMethod(method)
-                                                        .reqUri(uri)
-                                                        .build());
+                .builder()
+                .reqMethod(method)
+                .reqUri(uri)
+                .build());
 
         ReferenceConfigCache cache = ReferenceConfigCache.getCache();
         GenericService genericService = cache.get(config.getReference());
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         String result = "";
 
         if (StringUtils.isEmpty(config.getModel().getInterfaceMethodSign())) {
@@ -77,16 +80,17 @@ public class ApiGatewayController {
             }
 
             try {
-                result = objectMapper.writeValueAsString(genericService.$invoke(config.getModel().getInterfaceClass(),
-                        new String[] {params[0].getClass().getName()},
+                result =
+                        ResponseUtil.writeObjectValue2JsonString(genericService.$invoke(config.getModel().getInterfaceClass(),
+                        new String[]{params[0].getClass().getName()},
                         params));
-            } catch (JsonProcessingException e) {
+            } catch (IOException e) {
                 log.error("Jackson反序列化出错", e);
             }
             log.info("Single parameter invoke return: {}", result);
         } else {
             // 遵循阿里开发规范,当两个参数及以上时封装为pojo,pojo全路径记录在数据库中
-            String[] parameterTypes = new String[] {config.getModel().getInterfaceMethodSign()};
+            String[] parameterTypes = new String[]{config.getModel().getInterfaceMethodSign()};
             Map<String, Object> params = new HashMap<>();
             params.put("class", config.getModel().getInterfaceMethodSign());
             for (String key : map.keySet()) {
@@ -94,10 +98,11 @@ public class ApiGatewayController {
             }
 
             try {
-                result = objectMapper.writeValueAsString(genericService.$invoke(config.getModel().getInterfaceClass(),
+                result =
+                        ResponseUtil.writeObjectValue2JsonString(genericService.$invoke(config.getModel().getInterfaceClass(),
                         parameterTypes,
-                        new Object[] {params}));
-            } catch (JsonProcessingException e) {
+                        new Object[]{params}));
+            } catch (IOException e) {
                 log.error("Jackson反序列化出错", e);
             }
             log.info("Multi parameters invoke return: {}", result);

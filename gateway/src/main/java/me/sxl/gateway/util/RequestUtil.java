@@ -6,7 +6,7 @@ import me.sxl.common.utils.RSAUtil;
 import me.sxl.gateway.model.ApiGatewayDTO;
 
 @Slf4j
-public class RequestDecodeUtil {
+public class RequestUtil {
 
     public static String[] decode2ParamsAndDesKey(ApiGatewayDTO gatewayDTO, String RSAPrivateKey) {
         String desPrivateKey = getDesPrivateKey(gatewayDTO.getKey(), RSAPrivateKey);
