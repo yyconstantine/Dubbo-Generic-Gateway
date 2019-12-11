@@ -3,18 +3,36 @@
 
 <mapper namespace="me.sxl.gateway.mapper.ReferenceMapper">
     
-    <select id="dubboReferenceList" resultType="me.sxl.gateway.model.DubboReferenceModel">
+    <select id="listReference" resultType="me.sxl.gateway.model.DubboReferenceModel">
         select
             id,
             interfaceClass,
             interfaceMethod,
             interfaceMethodSign,
             requestMethod,
+            requestUri,
             owner
         from
             dubbo_interface_reference_mapping
         where
             status = 0
+    </select>
+
+    <select id="getByKey" parameterMap="me.sxl.gateway.model.DubboReferenceKey" resultType="me.sxl.gateway.model.DubboReferenceModel">
+        select
+            id,
+            interfaceClass,
+            interfaceMethod,
+            interfaceMethodSign,
+            requestMethod,
+            requestUri,
+            owner
+        from
+            dubbo_interface_reference_mapping
+        where
+            status = 0
+            and requestUri = #{reqUri}
+            and requestMethod = #{reqMethod}
     </select>
     
 </mapper>

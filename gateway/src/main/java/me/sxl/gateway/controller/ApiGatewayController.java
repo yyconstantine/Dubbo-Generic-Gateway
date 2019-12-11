@@ -15,6 +15,7 @@ import me.sxl.gateway.util.RequestUtil;
 import me.sxl.gateway.util.ResponseUtil;
 import org.apache.dubbo.config.utils.ReferenceConfigCache;
 import org.apache.dubbo.rpc.service.GenericService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @Slf4j
@@ -32,9 +34,16 @@ public class ApiGatewayController {
     @Value("${rsa.key.private}")
     private String privateKey;
 
+    private DubboReferenceConfig dubboReferenceConfig;
+
+    @Autowired
+    public void setDubboReferenceConfig(DubboReferenceConfig dubboReferenceConfig) {
+        this.dubboReferenceConfig = dubboReferenceConfig;
+    }
+
     @PostMapping("/route/{method}/{uri}")
     @SuppressWarnings("unchecked")
-    public ResponseEntity route(@PathVariable String method,
+    public String route(@PathVariable String method,
                                 @PathVariable String uri,
                                 @RequestBody ApiGatewayDTO gatewayDTO,
                                 HttpServletRequest request) {
@@ -48,7 +57,7 @@ public class ApiGatewayController {
 
         if (StringUtils.isEmpty(reqParams) || StringUtils.isEmpty(desKey)) {
             log.error("参数解析错误");
-            return ResponseEntity.error(ErrorEnum.REQ_DECODE_ERROR);
+            return ResponseEntity.error(ErrorEnum.REQ_DECODE_ERROR).toString();
         }
 
         log.info("参数解析结果为: {}", reqParams);
@@ -61,11 +70,18 @@ public class ApiGatewayController {
             log.error("参数序列化解析出错: ", e);
         }
 
-        DubboReferenceValue config = DubboReferenceConfig.get(DubboReferenceKey
+        DubboReferenceKey referenceKey = DubboReferenceKey
                 .builder()
                 .reqMethod(method)
                 .reqUri(uri)
-                .build());
+                .build();
+        DubboReferenceValue config = dubboReferenceConfig.get(referenceKey);
+        if (config == null) {
+            config = dubboReferenceConfig.putIfAbsent(referenceKey);
+            if (config == null) {
+                return DESUtil.encrypt(ResponseEntity.error(ErrorEnum.GLOBAL_DELETE_ERROR).toString(), desKey);
+            }
+        }
 
         ReferenceConfigCache cache = ReferenceConfigCache.getCache();
         GenericService genericService = cache.get(config.getReference());
@@ -82,8 +98,8 @@ public class ApiGatewayController {
             try {
                 result =
                         ResponseUtil.writeObjectValue2JsonString(genericService.$invoke(config.getModel().getInterfaceClass(),
-                        new String[]{params[0].getClass().getName()},
-                        params));
+                                new String[]{params[0].getClass().getName()},
+                                params));
             } catch (IOException e) {
                 log.error("Jackson反序列化出错", e);
             }
@@ -100,17 +116,15 @@ public class ApiGatewayController {
             try {
                 result =
                         ResponseUtil.writeObjectValue2JsonString(genericService.$invoke(config.getModel().getInterfaceClass(),
-                        parameterTypes,
-                        new Object[]{params}));
+                                parameterTypes,
+                                new Object[]{params}));
             } catch (IOException e) {
                 log.error("Jackson反序列化出错", e);
             }
             log.info("Multi parameters invoke return: {}", result);
         }
 
-        String resultByDes = DESUtil.encrypt(result, desKey);
-
-        return ResponseEntity.ok(OkEnum.GLOBAL_SEARCH_OK, resultByDes);
+        return DESUtil.encrypt(result, desKey);
     }
 
 }

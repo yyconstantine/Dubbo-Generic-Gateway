@@ -1,13 +1,12 @@
-package me.sxl.gateway.mapper;
+package me.sxl.gateway.service;
 
 import me.sxl.gateway.model.DubboReferenceKey;
 import me.sxl.gateway.model.DubboReferenceModel;
-import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Optional;
 
-@Mapper
-public interface ReferenceMapper {
+public interface ReferenceService {
 
     /**
      * 查询所有dubbo接口信息
@@ -20,6 +19,6 @@ public interface ReferenceMapper {
      * @param key key
      * @return dubbo接口信息
      */
-    DubboReferenceModel getByKey(DubboReferenceKey key);
+    Optional<DubboReferenceModel> getByKey(DubboReferenceKey key);
 
 }
