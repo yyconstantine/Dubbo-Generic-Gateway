@@ -1,6 +1,7 @@
 package me.sxl.gateway.config;
 
 import lombok.extern.slf4j.Slf4j;
+import me.sxl.gateway.model.Address;
 import me.sxl.gateway.model.DubboReferenceKey;
 import me.sxl.gateway.model.DubboReferenceModel;
 import me.sxl.gateway.model.DubboReferenceValue;
@@ -25,21 +26,26 @@ import java.util.Optional;
 @Slf4j
 public class DubboReferenceConfig {
 
-    @Value("${registry.address}")
-    private String registryAddr;
+    @Value("${dubbo.reference.registry.protocol}")
+    private String protocol;
 
     @Value("${spring.application.name}")
     private String applicationName;
 
     private ApplicationConfig applicationConfig;
 
-    private RegistryConfig registryConfig;
-
     private ReferenceService referenceService;
+
+    private RegistryCenterConfig registryCenterConfig;
 
     @Autowired
     public void setReferenceService(ReferenceService referenceService) {
         this.referenceService = referenceService;
+    }
+
+    @Autowired
+    public void setRegistryCenterConfig(RegistryCenterConfig registryCenterConfig) {
+        this.registryCenterConfig = registryCenterConfig;
     }
 
     /**
@@ -55,15 +61,17 @@ public class DubboReferenceConfig {
         applicationConfig = new ApplicationConfig();
         applicationConfig.setName(applicationName);
 
-        registryConfig = new RegistryConfig();
-        registryConfig.setAddress(registryAddr);
+        for (Address addr : this.registryCenterConfig.getAddrs()) {
+            RegistryConfig registryConfig = new RegistryConfig();
+            registryConfig.setAddress(addr.getAddress());
+            registryConfig.setProtocol(protocol);
+            applicationConfig.setRegistry(registryConfig);
+        }
 
-        applicationConfig.setRegistry(registryConfig);
 
         referenceList.forEach(model -> {
             ReferenceConfig<GenericService> reference = new ReferenceConfig<>();
             reference.setApplication(applicationConfig);
-            reference.setRegistry(registryConfig);
             reference.setInterface(model.getInterfaceClass());
             reference.setVersion(model.getVersion());
             reference.setRetries(model.getRetries());
@@ -105,7 +113,6 @@ public class DubboReferenceConfig {
         if (modelOpt.isPresent()) {
             ReferenceConfig<GenericService> reference = new ReferenceConfig<>();
             reference.setApplication(applicationConfig);
-            reference.setRegistry(registryConfig);
             reference.setInterface(modelOpt.get().getInterfaceClass());
             reference.setVersion(modelOpt.get().getVersion());
             reference.setRetries(modelOpt.get().getRetries());

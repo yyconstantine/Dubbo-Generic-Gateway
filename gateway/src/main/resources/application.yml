@@ -15,8 +15,17 @@ mybatis:
   configuration:
     use-actual-param-name: false
 
-registry:
-  address: zookeeper://127.0.0.1:2181
+dubbo:
+  reference:
+    registry:
+      protocol: zookeeper
+      addrs:
+        - id: zk1
+          address: 127.0.0.1:2181
+        - id: zk2
+          address: 127.0.0.1:2182
+        - id: zk3
+          address: 127.0.0.1:2183
 
 rsa:
   key:
