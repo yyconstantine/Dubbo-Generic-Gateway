@@ -1,11 +1,9 @@
 package me.sxl.gateway.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import me.sxl.gateway.model.Address;
-import me.sxl.gateway.model.DubboReferenceKey;
-import me.sxl.gateway.model.DubboReferenceModel;
-import me.sxl.gateway.model.DubboReferenceValue;
-import me.sxl.gateway.service.ReferenceService;
+import me.sxl.common.utils.RedisUtils;
+import me.sxl.gateway.model.*;
 import org.apache.dubbo.config.ApplicationConfig;
 import org.apache.dubbo.config.ReferenceConfig;
 import org.apache.dubbo.config.RegistryConfig;
@@ -14,12 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Configuration
 @Component
@@ -32,20 +28,23 @@ public class DubboReferenceConfig {
     @Value("${spring.application.name}")
     private String applicationName;
 
-    private ApplicationConfig applicationConfig;
+    @Value("${dubbo.reference.loadBalance}")
+    private String loadBalance;
 
-    private ReferenceService referenceService;
+    private RedisUtils redisUtils;
+
+    private ApplicationConfig applicationConfig = new ApplicationConfig();
 
     private RegistryCenterConfig registryCenterConfig;
 
     @Autowired
-    public void setReferenceService(ReferenceService referenceService) {
-        this.referenceService = referenceService;
+    public void setRegistryCenterConfig(RegistryCenterConfig registryCenterConfig) {
+        this.registryCenterConfig = registryCenterConfig;
     }
 
     @Autowired
-    public void setRegistryCenterConfig(RegistryCenterConfig registryCenterConfig) {
-        this.registryCenterConfig = registryCenterConfig;
+    public void setRedisUtils(RedisUtils redisUtils) {
+        this.redisUtils = redisUtils;
     }
 
     /**
@@ -55,10 +54,6 @@ public class DubboReferenceConfig {
 
     @PostConstruct
     public void init() {
-        List<DubboReferenceModel> referenceList = referenceService.listReference();
-        log.info("初始化加载dubbo泛化接口: {}", referenceList);
-
-        applicationConfig = new ApplicationConfig();
         applicationConfig.setName(applicationName);
 
         for (Address addr : this.registryCenterConfig.getAddrs()) {
@@ -68,34 +63,30 @@ public class DubboReferenceConfig {
             applicationConfig.setRegistry(registryConfig);
         }
 
+        Set<Object> apiSet = this.redisUtils.sGet(Constants.DUBBO_REDIS_KEY);
 
-        referenceList.forEach(model -> {
-            ReferenceConfig<GenericService> reference = new ReferenceConfig<>();
-            reference.setApplication(applicationConfig);
-            reference.setInterface(model.getInterfaceClass());
-            reference.setVersion(model.getVersion());
-            reference.setRetries(model.getRetries());
-            reference.setGeneric(true);
-
-            config.put(
-                    DubboReferenceKey
-                    .builder()
-                    .reqUri(model.getRequestUri())
-                    .reqMethod(model.getRequestMethod())
-                    .build(),
+        ObjectMapper objectMapper = new ObjectMapper();
+        for (Object o : apiSet) {
+            DubboReferenceModel model = objectMapper.convertValue(o, DubboReferenceModel.class);
+            config.put(DubboReferenceKey
+                            .builder()
+                            .reqUri(model.getRequestUri())
+                            .reqMethod(model.getRequestMethod())
+                            .version(model.getVersion())
+                            .build(),
                     DubboReferenceValue
                             .builder()
+                            .reference(buildReference(model))
                             .model(model)
-                            .reference(reference)
-                            .build()
-            );
-        });
+                            .build());
+        }
 
-        log.info("初始化加载完成,加载后的参数为: {}", config);
+        log.info("[Gateway] Load Dubbo APIs From Redis: {}", config);
     }
 
     /**
      * 对外暴露的get方法,获取reference和model
+     *
      * @param key 获取reference和model的唯一key
      * @return DubboReferenceValue
      */
@@ -105,27 +96,38 @@ public class DubboReferenceConfig {
 
     /**
      * 若请求到gateway的dubbo接口不在内存中,则去数据库中查询,若结果集不为空,加入到缓存中
+     *
      * @param key 获取reference和model的唯一key
-     * @return 获取到持久化信息则加入到内存并返回,未获取到则返回null
+     * @return 获取到持久化信息则加入到内存并返回, 未获取到则返回null
      */
     public DubboReferenceValue putIfAbsent(DubboReferenceKey key) {
-        Optional<DubboReferenceModel> modelOpt = this.referenceService.getByKey(key);
-        if (modelOpt.isPresent()) {
-            ReferenceConfig<GenericService> reference = new ReferenceConfig<>();
-            reference.setApplication(applicationConfig);
-            reference.setInterface(modelOpt.get().getInterfaceClass());
-            reference.setVersion(modelOpt.get().getVersion());
-            reference.setRetries(modelOpt.get().getRetries());
-            reference.setGeneric(true);
-
-            config.put(key,
-                    DubboReferenceValue.builder()
-                        .model(modelOpt.get())
-                        .reference(reference)
-                        .build());
-            return this.get(key);
+        // 获取最新的缓存加载结果
+        Set<Object> dubboSet = this.redisUtils.sGet(Constants.DUBBO_REDIS_KEY);
+        ObjectMapper objectMapper = new ObjectMapper();
+        for (Object o : dubboSet) {
+            DubboReferenceModel model = objectMapper.convertValue(o, DubboReferenceModel.class);
+            if (model.getRequestUri().equals(key.getReqUri()) && model.getRequestMethod().equals(key.getReqMethod()) && model.getVersion().equals(key.getVersion())) {
+                config.put(key,
+                        DubboReferenceValue
+                                .builder()
+                                .reference(buildReference(model))
+                                .model(model)
+                                .build());
+                return this.get(key);
+            }
         }
         return null;
+    }
+
+    private ReferenceConfig<GenericService> buildReference(DubboReferenceModel model) {
+        ReferenceConfig<GenericService> reference = new ReferenceConfig<>();
+        reference.setInterface(model.getInterfaceClass());
+        reference.setTimeout(model.getTimeout());
+        reference.setGeneric(true);
+        reference.setApplication(applicationConfig);
+        reference.setValidation("Validated");
+        reference.setLoadbalance(StringUtils.isEmpty(loadBalance) ? "random" : loadBalance);
+        return reference;
     }
 
 }

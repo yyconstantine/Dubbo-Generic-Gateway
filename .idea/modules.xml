@@ -6,6 +6,8 @@
       <module fileurl="file://$PROJECT_DIR$/dependencies/dependencies.iml" filepath="$PROJECT_DIR$/dependencies/dependencies.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/dubbo-reference.iml" filepath="$PROJECT_DIR$/.idea/dubbo-reference.iml" />
       <module fileurl="file://$PROJECT_DIR$/gateway/gateway.iml" filepath="$PROJECT_DIR$/gateway/gateway.iml" />
+      <module fileurl="file://$PROJECT_DIR$/order/order.iml" filepath="$PROJECT_DIR$/order/order.iml" />
+      <module fileurl="file://$PROJECT_DIR$/order-api/order-api.iml" filepath="$PROJECT_DIR$/order-api/order-api.iml" />
     </modules>
   </component>
 </project>

@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum  ErrorEnum {
 
+    PATH_NOT_FOUND(404, "请求路径不存在"),
     METHOD_NOT_SUPPORT(405, "请求方法不支持"),
     UNKNOWN(500, "系统内部错误"),
 

@@ -11,4 +11,4 @@
 ---
 🚩PS:
 - 请求路径内的method和uri是为了一定程度上(弱)保证restful风格。。
-- 生成rsa公钥私钥对的方法在```me.sxl.common.utils.RSAUtil#init()```
+- 生成rsa公钥私钥对的方法在```me.sxl.common.utils.RSAUtils#init()```

@@ -1,13 +1,13 @@
-package me.sxl.gateway;
+package me.sxl.order.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication(scanBasePackages = "me.sxl")
-public class GatewayApplication {
+@SpringBootApplication
+public class OrderApiApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(GatewayApplication.class, args);
+        SpringApplication.run(OrderApiApplication.class, args);
     }
 
 }

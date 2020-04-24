@@ -17,6 +17,8 @@
     <modules>
         <module>../common</module>
         <module>../gateway</module>
+        <module>../order</module>
+        <module>../order-api</module>
     </modules>
 
     <properties>

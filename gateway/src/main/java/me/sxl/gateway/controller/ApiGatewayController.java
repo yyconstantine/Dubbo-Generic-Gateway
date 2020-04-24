@@ -4,13 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import me.sxl.common.constant.ErrorEnum;
-import me.sxl.common.constant.OkEnum;
 import me.sxl.common.model.ResponseEntity;
-import me.sxl.common.utils.DESUtil;
+import me.sxl.common.utils.DESUtils;
 import me.sxl.gateway.config.DubboReferenceConfig;
 import me.sxl.gateway.model.ApiGatewayDTO;
 import me.sxl.gateway.model.DubboReferenceKey;
 import me.sxl.gateway.model.DubboReferenceValue;
+import me.sxl.gateway.service.ReferenceService;
 import me.sxl.gateway.util.RequestUtil;
 import me.sxl.gateway.util.ResponseUtil;
 import org.apache.dubbo.config.utils.ReferenceConfigCache;
@@ -36,31 +36,40 @@ public class ApiGatewayController {
 
     private DubboReferenceConfig dubboReferenceConfig;
 
+    private ReferenceService referenceService;
+
     @Autowired
     public void setDubboReferenceConfig(DubboReferenceConfig dubboReferenceConfig) {
         this.dubboReferenceConfig = dubboReferenceConfig;
     }
 
-    @PostMapping("/route/{method}/{uri}")
+    @Autowired
+    public void setReferenceService(ReferenceService referenceService) {
+        this.referenceService = referenceService;
+    }
+
+    @PostMapping("/api/{version}/{method}/{uri}")
     @SuppressWarnings("unchecked")
     public String route(@PathVariable String method,
-                                @PathVariable String uri,
-                                @RequestBody ApiGatewayDTO gatewayDTO,
-                                HttpServletRequest request) {
+                        @PathVariable String uri,
+                        @PathVariable String version,
+                        @RequestBody ApiGatewayDTO gatewayDTO,
+                        HttpServletRequest request) throws IOException {
         log.info("上传参数: method >> {}, uri >> {}, DTO >> {}", method, uri, gatewayDTO);
+
         // 这里做解密过程
         String[] paramsAndDesKey = RequestUtil.decode2ParamsAndDesKey(gatewayDTO, privateKey);
         String reqParams = paramsAndDesKey[0];
         String desKey = paramsAndDesKey[1];
 
-        request.setAttribute("DES_KEY", desKey);
-
         if (StringUtils.isEmpty(reqParams) || StringUtils.isEmpty(desKey)) {
             log.error("参数解析错误");
             return ResponseEntity.error(ErrorEnum.REQ_DECODE_ERROR).toString();
         }
-
         log.info("参数解析结果为: {}", reqParams);
+
+        // 将des-key传入请求上下文,用于ExceptionHandler拦截异常时进行加密,不太优雅的实现
+        request.setAttribute("DES_KEY", desKey);
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = new HashMap<>();
@@ -70,61 +79,29 @@ public class ApiGatewayController {
             log.error("参数序列化解析出错: ", e);
         }
 
-        DubboReferenceKey referenceKey = DubboReferenceKey
+        return this.generic(uri, method, version, map, desKey);
+    }
+
+    private String generic(String reqUri, String reqMethod, String version, Map<String, Object> map, String desKey) throws IOException {
+        // 根据uri和method唯一确定一个dubbo泛化接口
+        Optional<DubboReferenceValue> referenceOpt = this.referenceService.findDubboReferenceBy(DubboReferenceKey
                 .builder()
-                .reqMethod(method)
-                .reqUri(uri)
-                .build();
-        DubboReferenceValue config = dubboReferenceConfig.get(referenceKey);
-        if (config == null) {
-            config = dubboReferenceConfig.putIfAbsent(referenceKey);
-            if (config == null) {
-                return DESUtil.encrypt(ResponseEntity.error(ErrorEnum.GLOBAL_DELETE_ERROR).toString(), desKey);
-            }
+                .reqUri(reqUri)
+                .reqMethod(reqMethod)
+                .version(version)
+                .build());
+
+        if (!referenceOpt.isPresent()) {
+            log.warn("上送路径不存在: {}", reqMethod + "/" + reqUri);
+            return DESUtils.encrypt(ResponseUtil.writeResultValue2JsonString(ResponseEntity.error(ErrorEnum.PATH_NOT_FOUND)),
+                    desKey);
         }
 
-        ReferenceConfigCache cache = ReferenceConfigCache.getCache();
-        GenericService genericService = cache.get(config.getReference());
+        String rtValue = this.referenceService.invoke(map, referenceOpt.get());
+        log.info("$invoke(return): {}", rtValue);
 
-        String result = "";
-
-        if (StringUtils.isEmpty(config.getModel().getInterfaceMethodSign())) {
-            // 当不设置方法签名时,默认其只有一个String类型的参数
-            Object[] params = new Object[1];
-            for (String key : map.keySet()) {
-                params[0] = map.get(key);
-            }
-
-            try {
-                result =
-                        ResponseUtil.writeObjectValue2JsonString(genericService.$invoke(config.getModel().getInterfaceClass(),
-                                new String[]{params[0].getClass().getName()},
-                                params));
-            } catch (IOException e) {
-                log.error("Jackson反序列化出错", e);
-            }
-            log.info("Single parameter invoke return: {}", result);
-        } else {
-            // 遵循阿里开发规范,当两个参数及以上时封装为pojo,pojo全路径记录在数据库中
-            String[] parameterTypes = new String[]{config.getModel().getInterfaceMethodSign()};
-            Map<String, Object> params = new HashMap<>();
-            params.put("class", config.getModel().getInterfaceMethodSign());
-            for (String key : map.keySet()) {
-                params.put(key, map.get(key));
-            }
-
-            try {
-                result =
-                        ResponseUtil.writeObjectValue2JsonString(genericService.$invoke(config.getModel().getInterfaceClass(),
-                                parameterTypes,
-                                new Object[]{params}));
-            } catch (IOException e) {
-                log.error("Jackson反序列化出错", e);
-            }
-            log.info("Multi parameters invoke return: {}", result);
-        }
-
-        return DESUtil.encrypt(result, desKey);
+        // 将返回参数进行包装(des加密)
+        return DESUtils.encrypt(rtValue, desKey);
     }
 
 }

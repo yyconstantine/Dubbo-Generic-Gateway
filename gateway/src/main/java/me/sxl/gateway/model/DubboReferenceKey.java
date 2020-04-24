@@ -20,4 +20,9 @@ public class DubboReferenceKey {
      */
     private String reqMethod;
 
+    /**
+     * 请求接口版本号
+     */
+    private String version;
+
 }

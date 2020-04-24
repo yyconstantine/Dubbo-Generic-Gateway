@@ -7,13 +7,17 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="common" />
+        <module name="order-api" />
         <module name="gateway" />
+        <module name="order" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="common" target="1.8" />
       <module name="dependencies" target="1.8" />
       <module name="gateway" target="1.8" />
+      <module name="order" target="1.8" />
+      <module name="order-api" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
@@ -21,6 +25,8 @@
       <module name="common" options="-parameters" />
       <module name="dependencies" options="-parameters" />
       <module name="gateway" options="-parameters" />
+      <module name="order" options="-parameters" />
+      <module name="order-api" options="-parameters" />
     </option>
   </component>
 </project>
