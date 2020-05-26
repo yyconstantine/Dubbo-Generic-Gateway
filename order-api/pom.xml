@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>me.sxl</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>gateway</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

@@ -1,4 +1,4 @@
-package me.sxl.common.utils;
+package me.sxl.gateway.util;
 
 import lombok.extern.slf4j.Slf4j;
 

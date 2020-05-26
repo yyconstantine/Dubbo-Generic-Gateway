@@ -1,4 +1,4 @@
-package me.sxl.common.constant;
+package me.sxl.gateway.model.constant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

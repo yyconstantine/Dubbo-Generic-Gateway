@@ -1,4 +1,4 @@
-package me.sxl.common.annotation;
+package me.sxl.gateway.annotation;
 
 import java.lang.annotation.*;
 

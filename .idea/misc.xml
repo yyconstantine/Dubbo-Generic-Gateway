@@ -7,12 +7,11 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/dependencies/pom.xml" />
-        <option value="$PROJECT_DIR$/common/pom.xml" />
         <option value="$PROJECT_DIR$/gateway/pom.xml" />
         <option value="$PROJECT_DIR$/order-api/pom.xml" />
         <option value="$PROJECT_DIR$/order/pom.xml" />
       </list>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="false" project-jdk-name="1.8" project-jdk-type="JavaSDK" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="false" project-jdk-name="1.8.0_231" project-jdk-type="JavaSDK" />
 </project>

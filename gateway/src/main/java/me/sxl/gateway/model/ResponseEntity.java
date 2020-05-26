@@ -1,4 +1,4 @@
-package me.sxl.common.model;
+package me.sxl.gateway.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
