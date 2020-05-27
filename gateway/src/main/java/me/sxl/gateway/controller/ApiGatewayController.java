@@ -29,7 +29,7 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class ApiGatewayController {
 
-    @Value("${rsa.key.private}")
+    @Value("${rsa.key.private:null}")
     private String privateKey;
 
     private DubboReferenceConfig dubboReferenceConfig;

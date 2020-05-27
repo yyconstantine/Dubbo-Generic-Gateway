@@ -4,6 +4,8 @@ public class Constants {
 
     public final static String TEST_KEY = "Test";
 
+    public final static String GATEWAY_KEY = "gateway";
+
     public final static String V1_VERSION = "v1";
 
     public final static String DUBBO_PROTOCOL_VALUE = "dubbo";

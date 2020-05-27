@@ -36,6 +36,9 @@ public class ApiResourceLoader implements BeanPostProcessor {
     @SneakyThrows
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        if (bean.getClass().getName().contains(Constants.GATEWAY_KEY)) {
+            return bean;
+        }
         if (bean.getClass().getName().startsWith(this.propertyConfig.getScanPackages())) {
             Method[] methods = ReflectionUtils.getAllDeclaredMethods(bean.getClass());
             if (methods != null) {
