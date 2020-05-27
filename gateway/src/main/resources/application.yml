@@ -17,16 +17,14 @@ mybatis:
 
 dubbo:
   reference:
+    scan-package: me.sxl
     registry:
-      protocol: zookeeper
-      addrs:
-        - id: zk1
-          address: 127.0.0.1:2181
-        - id: zk2
-          address: 127.0.0.1:2182
-        - id: zk3
-          address: 127.0.0.1:2183
-
-rsa:
-  key:
-    private:
+      protocol: nacos
+#      protocol: zookeeper
+#      addrs:
+#        - id: addr1
+#          address: 127.0.0.1:2181
+#        - id: addr2
+#          address: 127.0.0.1:2182
+#        - id: addr3
+#          address: 127.0.0.1:2183

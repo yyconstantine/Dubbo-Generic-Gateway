@@ -3,18 +3,16 @@ package me.sxl.gateway.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import me.sxl.common.constant.ErrorEnum;
-import me.sxl.common.model.ResponseEntity;
-import me.sxl.common.utils.DESUtils;
 import me.sxl.gateway.config.DubboReferenceConfig;
 import me.sxl.gateway.model.ApiGatewayDTO;
 import me.sxl.gateway.model.DubboReferenceKey;
 import me.sxl.gateway.model.DubboReferenceValue;
+import me.sxl.gateway.model.ResponseEntity;
+import me.sxl.gateway.model.constant.ErrorEnum;
 import me.sxl.gateway.service.ReferenceService;
-import me.sxl.gateway.util.RequestUtil;
-import me.sxl.gateway.util.ResponseUtil;
-import org.apache.dubbo.config.utils.ReferenceConfigCache;
-import org.apache.dubbo.rpc.service.GenericService;
+import me.sxl.gateway.util.DESUtils;
+import me.sxl.gateway.util.RequestUtils;
+import me.sxl.gateway.util.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
@@ -48,7 +46,7 @@ public class ApiGatewayController {
         this.referenceService = referenceService;
     }
 
-    @PostMapping("/api/{version}/{method}/{uri}")
+    @RequestMapping("/api/{version}/{method}/{uri}")
     @SuppressWarnings("unchecked")
     public String route(@PathVariable String method,
                         @PathVariable String uri,
@@ -58,7 +56,7 @@ public class ApiGatewayController {
         log.info("上传参数: method >> {}, uri >> {}, DTO >> {}", method, uri, gatewayDTO);
 
         // 这里做解密过程
-        String[] paramsAndDesKey = RequestUtil.decode2ParamsAndDesKey(gatewayDTO, privateKey);
+        String[] paramsAndDesKey = RequestUtils.decode2ParamsAndDesKey(gatewayDTO, privateKey);
         String reqParams = paramsAndDesKey[0];
         String desKey = paramsAndDesKey[1];
 
@@ -93,7 +91,7 @@ public class ApiGatewayController {
 
         if (!referenceOpt.isPresent()) {
             log.warn("上送路径不存在: {}", reqMethod + "/" + reqUri);
-            return DESUtils.encrypt(ResponseUtil.writeResultValue2JsonString(ResponseEntity.error(ErrorEnum.PATH_NOT_FOUND)),
+            return DESUtils.encrypt(ResponseUtils.writeResultValue2JsonString(ResponseEntity.error(ErrorEnum.PATH_NOT_FOUND)),
                     desKey);
         }
 

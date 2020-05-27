@@ -1,12 +1,10 @@
 package me.sxl.gateway.util;
 
 import lombok.extern.slf4j.Slf4j;
-import me.sxl.common.utils.DESUtils;
-import me.sxl.common.utils.RSAUtils;
 import me.sxl.gateway.model.ApiGatewayDTO;
 
 @Slf4j
-public class RequestUtil {
+public class RequestUtils {
 
     public static String[] decode2ParamsAndDesKey(ApiGatewayDTO gatewayDTO, String RSAPrivateKey) {
         String desPrivateKey = getDesPrivateKey(gatewayDTO.getKey(), RSAPrivateKey);

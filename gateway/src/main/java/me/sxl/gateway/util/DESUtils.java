@@ -10,7 +10,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 
 /**
- * @author songxianglong
+ * @author yyconstantine
  * @date 2019/11/11 16:22
  */
 @Slf4j

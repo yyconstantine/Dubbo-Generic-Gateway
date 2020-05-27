@@ -2,12 +2,12 @@ package me.sxl.order.api.exception;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import me.sxl.common.constant.ErrorEnum;
-import me.sxl.common.constant.OkEnum;
-import me.sxl.common.model.ResponseEntity;
+import me.sxl.gateway.model.ResponseEntity;
+import me.sxl.gateway.model.constant.ErrorEnum;
+import me.sxl.gateway.model.constant.OkEnum;
 
 /**
- * @author songxianglong
+ * @author yyconstantine
  * @date 2020/4/24 下午 4:55
  */
 @Data

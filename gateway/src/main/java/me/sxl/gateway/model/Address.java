@@ -3,7 +3,7 @@ package me.sxl.gateway.model;
 import lombok.Data;
 
 /**
- * @author songxianglong
+ * @author yyconstantine
  * @date 2019/12/12 20:04
  */
 @Data

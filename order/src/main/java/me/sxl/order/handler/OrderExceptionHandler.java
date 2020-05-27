@@ -1,8 +1,8 @@
 package me.sxl.order.handler;
 
 import lombok.extern.slf4j.Slf4j;
-import me.sxl.common.constant.ErrorEnum;
-import me.sxl.common.model.ResponseEntity;
+import me.sxl.gateway.model.ResponseEntity;
+import me.sxl.gateway.model.constant.ErrorEnum;
 import me.sxl.order.api.exception.OrderServiceRuntimeException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.ConstraintViolationException;
 
 /**
- * @author songxianglong
+ * @author yyconstantine
  * @date 2020/4/24 下午 4:54
  */
 @Component

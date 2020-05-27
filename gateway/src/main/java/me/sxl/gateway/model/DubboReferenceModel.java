@@ -1,44 +1,24 @@
 package me.sxl.gateway.model;
 
+import lombok.Builder;
 import lombok.Data;
 
+/**
+ * @author yyconstantine
+ */
 @Data
+@Builder
 public class DubboReferenceModel {
 
     /**
-     * 主键
+     * reqMethod + reqUri取hashcode,保证同个请求的接口唯一性
      */
-    private Long id;
+    private Integer id;
 
     /**
-     * dubbo接口全路径
+     * 请求uri
      */
-    private String interfaceClass;
-
-    /**
-     * dubbo接口具体方法名称
-     */
-    private String interfaceMethod;
-
-    /**
-     * dubbo接口方法签名全路径
-     */
-    private String interfaceMethodSign;
-
-    /**
-     * 接口超时时间
-     */
-    private Integer timeout;
-
-    /**
-     * 重试次数
-     */
-    private Integer retries;
-
-    /**
-     * 定义的接口版本号
-     */
-    private String version;
+    private String requestUri;
 
     /**
      * 请求方法,GET/POST/PUT/DELETE
@@ -46,18 +26,33 @@ public class DubboReferenceModel {
     private String requestMethod;
 
     /**
-     * 请求路径,走统一网关但是需要对外提供具体访问的接口路径,这里定义为REST风格
+     * dubbo接口全路径
      */
-    private String requestUri;
+    private String dubboInterface;
 
     /**
-     * 接口状态,0可用1不可用
+     * 超时时间,可为空
      */
-    private Integer status;
+    private Integer timeout;
 
     /**
-     * 接口归属人
+     * 协议
      */
-    private String owner;
+    private String protocol;
+
+    /**
+     * 具体方法,拿uri置换
+     */
+    private String dubboMethod;
+
+    /**
+     * 接口签名全路径
+     */
+    private String methodSign;
+
+    /**
+     * 接口版本
+     */
+    private String version;
 
 }

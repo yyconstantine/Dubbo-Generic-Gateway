@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import me.sxl.common.model.ResponseEntity;
+import me.sxl.gateway.model.ResponseEntity;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author songxianglong
+ * @author yyconstantine
  * @date 2019/11/21 13:23
  */
 @Slf4j
 @SuppressWarnings("unchecked")
-public class ResponseUtil {
+public class ResponseUtils {
 
     /**
      * 定义需要去除的信息

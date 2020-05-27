@@ -4,7 +4,7 @@ import me.sxl.gateway.config.DubboReferenceConfig;
 import me.sxl.gateway.model.DubboReferenceKey;
 import me.sxl.gateway.model.DubboReferenceValue;
 import me.sxl.gateway.service.ReferenceService;
-import me.sxl.gateway.util.ResponseUtil;
+import me.sxl.gateway.util.ResponseUtils;
 import org.apache.dubbo.config.utils.ReferenceConfigCache;
 import org.apache.dubbo.rpc.service.GenericService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class ReferenceServiceImpl implements ReferenceService {
     }
 
     @Override
-    public Optional<DubboReferenceValue> findDubboReferenceBy(DubboReferenceKey key) {
+    public Optional<DubboReferenceValue> findDubboReferenceBy(DubboReferenceKey key) throws IOException {
         DubboReferenceValue config = dubboReferenceConfig.get(key);
         if (config == null) {
             config = dubboReferenceConfig.putIfAbsent(key);
@@ -44,34 +44,34 @@ public class ReferenceServiceImpl implements ReferenceService {
         ReferenceConfigCache cache = ReferenceConfigCache.getCache();
         GenericService genericService = cache.get(reference.getReference());
 
-        String rpcResult = "";
-        if (StringUtils.isEmpty(reference.getModel().getInterfaceMethodSign())) {
+        String rpcResult;
+        if (StringUtils.isEmpty(reference.getModel().getMethodSign())) {
             // 接口签名无信息
             rpcResult =
-                    ResponseUtil.writeObjectValue2JsonString(genericService.$invoke(reference.getModel().getInterfaceMethod(),
+                    ResponseUtils.writeObjectValue2JsonString(genericService.$invoke(reference.getModel().getDubboMethod(),
                             null, null));
-        } else if (reference.getModel().getInterfaceMethodSign().startsWith("java")) {
+        } else if (reference.getModel().getMethodSign().startsWith("java")) {
             Object[] objects = new Object[1];
-            for (String key : params.keySet()) {
-                objects[0] = params.get(key);
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                objects[0] = entry.getValue();
             }
 
             // 接口签名为基本数据类型或集合类型
             rpcResult =
-                    ResponseUtil.writeObjectValue2JsonString(genericService.$invoke(reference.getModel().getInterfaceMethod(),
-                            new String[]{reference.getModel().getInterfaceMethodSign()},
+                    ResponseUtils.writeObjectValue2JsonString(genericService.$invoke(reference.getModel().getDubboMethod(),
+                            new String[]{reference.getModel().getMethodSign()},
                             objects));
 
         } else {
             // 接口签名为pojo类型
-            String[] parameterTypes = new String[]{reference.getModel().getInterfaceMethodSign()};
+            String[] parameterTypes = new String[]{reference.getModel().getMethodSign()};
             Map<String, Object> pojo = new HashMap<>(8);
-            params.put("class", reference.getModel().getInterfaceMethodSign());
-            for (String key : params.keySet()) {
-                pojo.put(key, params.get(key));
+            params.put("class", reference.getModel().getMethodSign());
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                pojo.put(entry.getKey(), entry.getValue());
             }
             rpcResult =
-                    ResponseUtil.writeObjectValue2JsonString(genericService.$invoke(reference.getModel().getInterfaceMethod(),
+                    ResponseUtils.writeObjectValue2JsonString(genericService.$invoke(reference.getModel().getDubboMethod(),
                             parameterTypes,
                             new Object[]{pojo}));
 

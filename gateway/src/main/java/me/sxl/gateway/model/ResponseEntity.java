@@ -2,8 +2,8 @@ package me.sxl.gateway.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import me.sxl.common.constant.ErrorEnum;
-import me.sxl.common.constant.OkEnum;
+import me.sxl.gateway.model.constant.ErrorEnum;
+import me.sxl.gateway.model.constant.OkEnum;
 
 @Data
 @AllArgsConstructor

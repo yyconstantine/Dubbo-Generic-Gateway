@@ -14,7 +14,7 @@ public interface ReferenceService {
      * @param key uri && method
      * @return dubbo引用实例
      */
-    Optional<DubboReferenceValue> findDubboReferenceBy(DubboReferenceKey key);
+    Optional<DubboReferenceValue> findDubboReferenceBy(DubboReferenceKey key) throws IOException;
 
     /**
      * 真正执行rpc接口调用逻辑(rpc接口调用)的地方
