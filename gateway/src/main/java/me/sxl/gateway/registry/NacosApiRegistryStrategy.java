@@ -16,7 +16,7 @@ import java.util.Map;
  * @date 2020/5/27 上午 9:31
  */
 @Service
-public class NacosApiRegistry extends ApiResourceLoader implements ApiRegistry {
+public class NacosApiRegistryStrategy extends ApiResourceLoader implements ApiRegistryStrategy {
 
     @NacosInjected
     private ConfigService configService;

@@ -23,19 +23,19 @@ public class PropertyConfig {
     @Value("${spring.application.name:api-gateway}")
     private String applicationName;
 
-    @Value("${dubbo.reference.registry.protocol:dubbo}")
+    @Value("${gateway.registry.protocol:dubbo}")
     private String protocol;
 
-    @Value("${dubbo.reference.loadbalance:random}")
+    @Value("${gateway.loadbalance:random}")
     private String loadBalance;
 
-    @Value("${dubbo.reference.scan-package}")
+    @Value("${gateway.scan-package}")
     private String scanPackages;
 
-    @Value("${dubbo.reference.nacos-group:testGroup}")
+    @Value("${gateway.nacos-group:testGroup}")
     private String nacosGroupId;
 
-    @Value("${dubbo.reference.nacos-data:testData}")
+    @Value("${gateway.nacos-data:testData}")
     private String nacosDataId;
 
     private RegistryCenterConfig registryCenterConfig;

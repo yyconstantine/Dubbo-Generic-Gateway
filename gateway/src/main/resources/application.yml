@@ -4,17 +4,3 @@ server:
 spring:
   application:
     name: gateway
-
-dubbo:
-  reference:
-    scan-package: me.sxl
-    registry:
-      protocol: nacos
-#      protocol: zookeeper
-#      addrs:
-#        - id: addr1
-#          address: 127.0.0.1:2181
-#        - id: addr2
-#          address: 127.0.0.1:2182
-#        - id: addr3
-#          address: 127.0.0.1:2183

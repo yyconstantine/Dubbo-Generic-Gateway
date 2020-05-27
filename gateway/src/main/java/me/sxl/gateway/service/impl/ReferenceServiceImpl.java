@@ -1,16 +1,16 @@
 package me.sxl.gateway.service.impl;
 
-import me.sxl.gateway.config.DubboReferenceConfig;
 import me.sxl.gateway.model.DubboReferenceKey;
 import me.sxl.gateway.model.DubboReferenceValue;
+import me.sxl.gateway.reference.ReferenceConfigHandler;
 import me.sxl.gateway.service.ReferenceService;
 import me.sxl.gateway.util.ResponseUtils;
 import org.apache.dubbo.config.utils.ReferenceConfigCache;
 import org.apache.dubbo.rpc.service.GenericService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,18 +20,18 @@ import java.util.Optional;
 @Service
 public class ReferenceServiceImpl implements ReferenceService {
 
-    private DubboReferenceConfig dubboReferenceConfig;
+    private ReferenceConfigHandler handler;
 
-    @Autowired
-    public void setDubboReferenceConfig(DubboReferenceConfig dubboReferenceConfig) {
-        this.dubboReferenceConfig = dubboReferenceConfig;
+    @Resource
+    public void setHandler(ReferenceConfigHandler handler) {
+        this.handler = handler;
     }
 
     @Override
     public Optional<DubboReferenceValue> findDubboReferenceBy(DubboReferenceKey key) throws IOException {
-        DubboReferenceValue config = dubboReferenceConfig.get(key);
+        DubboReferenceValue config = this.handler.get(key);
         if (config == null) {
-            config = dubboReferenceConfig.putIfAbsent(key);
+            config = this.handler.putIfAbsent(key);
             if (config == null) {
                 return Optional.empty();
             }

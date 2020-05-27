@@ -6,13 +6,13 @@ import org.apache.dubbo.common.extension.Adaptive;
 import org.apache.dubbo.common.extension.SPI;
 
 /**
- * 接口注册协议,使用SPI方式进行加载,默认使用nacos
+ * 接口注册策略,使用SPI方式进行加载,默认使用nacos
  *
  * @author yyconstantine
  * @date 2020/5/27 上午 9:26
  */
-@SPI("${dubbo.reference.register:nacos}")
-public interface ApiRegistry {
+@SPI("${gateway.register.protocol:nacos}")
+public interface ApiRegistryStrategy {
 
     /**
      * api注册接口,通过继承

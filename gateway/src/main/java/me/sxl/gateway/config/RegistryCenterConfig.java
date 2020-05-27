@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Component
 @Data
-@ConfigurationProperties(prefix = "dubbo.reference.registry.addrs")
+@ConfigurationProperties(prefix = "gateway.registry.addrs")
 public class RegistryCenterConfig {
 
     private List<Address> addrs = new ArrayList<>();

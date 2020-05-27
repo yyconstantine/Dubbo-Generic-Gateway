@@ -25,6 +25,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: com.alibaba.boot:nacos-config-spring-boot-starter:0.2.7" level="project" />
+    <orderEntry type="library" name="Maven: com.alibaba.boot:nacos-config-spring-boot-autoconfigure:0.2.7" level="project" />
     <orderEntry type="module" module-name="gateway" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-web:2.2.1.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter:2.2.1.RELEASE" level="project" />
