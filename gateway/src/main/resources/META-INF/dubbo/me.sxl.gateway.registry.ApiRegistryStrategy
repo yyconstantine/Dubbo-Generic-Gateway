@@ -1,0 +1,3 @@
+nacos=NacosApiRegistryStrategy
+redis=RedisApiRegistryStrategy
+zookeeper=ZookeeperApiRegistryStrategy
