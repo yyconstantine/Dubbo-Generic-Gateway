@@ -12,10 +12,12 @@ import me.sxl.gateway.service.ReferenceService;
 import me.sxl.gateway.util.DESUtils;
 import me.sxl.gateway.util.RequestUtils;
 import me.sxl.gateway.util.ResponseUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -33,18 +35,19 @@ public class ApiGatewayController {
 
     private ReferenceService referenceService;
 
-    @Autowired
+    /*@Autowired
     public void setReferenceService(ReferenceService referenceService) {
         this.referenceService = referenceService;
-    }
+    }*/
 
-    @RequestMapping("/api/{version}/{method}/{uri}")
+    @RequestMapping("/api/{version}/{uri}")
     @SuppressWarnings("unchecked")
-    public String route(@PathVariable String method,
-                        @PathVariable String uri,
+    public String route(@PathVariable String uri,
                         @PathVariable String version,
                         @RequestBody ApiGatewayDTO gatewayDTO,
                         HttpServletRequest request) throws IOException {
+        // 获取请求方式
+        String method = request.getMethod();
         log.info("上传参数: method >> {}, uri >> {}, DTO >> {}", method, uri, gatewayDTO);
 
         // 这里做解密过程

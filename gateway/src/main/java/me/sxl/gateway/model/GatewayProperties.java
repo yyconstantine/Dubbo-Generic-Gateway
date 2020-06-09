@@ -6,17 +6,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @author yyconstantine
- * @date 2020/5/15 上午 11:52
+ * 网关注册、引用相关属性
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Properties {
+public class GatewayProperties {
 
-    private GatewayProperties gatewayProperties;
+    private String referenceProtocol;
 
-    private RpcProperties rpcProperties;
+    private String registryProtocol;
 
 }

@@ -1,7 +1,10 @@
 package me.sxl.gateway.config;
 
 import lombok.Getter;
+import me.sxl.gateway.model.GatewayProperties;
 import me.sxl.gateway.model.Properties;
+import me.sxl.gateway.model.RpcProperties;
+import me.sxl.gateway.model.constant.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -23,13 +26,16 @@ public class PropertyConfig {
     @Value("${spring.application.name:api-gateway}")
     private String applicationName;
 
-    @Value("${gateway.registry.protocol:dubbo}")
-    private String protocol;
+    @Value("${gateway.reference.protocol:nacos}")
+    private String referenceProtocol;
+
+    @Value("${gateway.registry.protocol:nacos}")
+    private String registryProtocol;
 
     @Value("${gateway.loadbalance:random}")
     private String loadBalance;
 
-    @Value("${gateway.scan-package}")
+    @Value("${gateway.scan-packages:null}")
     private String scanPackages;
 
     @Value("${gateway.nacos-group:testGroup}")
@@ -49,10 +55,16 @@ public class PropertyConfig {
     @ConditionalOnMissingBean
     public Properties properties() {
         return Properties.builder()
-                .applicationName(applicationName)
-                .protocol(protocol)
-                .loadBalance(loadBalance)
-                .addresses(registryCenterConfig.getAddrs())
+                .gatewayProperties(GatewayProperties.builder()
+                        .referenceProtocol(this.referenceProtocol)
+                        .registryProtocol(this.registryProtocol)
+                        .build())
+                .rpcProperties(RpcProperties.builder()
+                        .applicationName(applicationName)
+                        .protocol(Constants.DUBBO_PROTOCOL_VALUE)
+                        .loadBalance(loadBalance)
+                        .addresses(registryCenterConfig.getAddrs())
+                        .build())
                 .build();
     }
 

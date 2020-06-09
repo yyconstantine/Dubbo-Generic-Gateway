@@ -2,7 +2,6 @@ package me.sxl.gateway.registry;
 
 import com.alibaba.nacos.api.exception.NacosException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.dubbo.common.extension.Adaptive;
 import org.apache.dubbo.common.extension.SPI;
 
 /**
@@ -11,7 +10,7 @@ import org.apache.dubbo.common.extension.SPI;
  * @author yyconstantine
  * @date 2020/5/27 上午 9:26
  */
-@SPI("${gateway.register.protocol:nacos}")
+@SPI
 public interface ApiRegistryStrategy {
 
     /**
@@ -22,7 +21,6 @@ public interface ApiRegistryStrategy {
      * @param bean
      * @param beanName
      */
-    @Adaptive
     void registry(Object bean, String beanName) throws JsonProcessingException, NacosException;
 
 }

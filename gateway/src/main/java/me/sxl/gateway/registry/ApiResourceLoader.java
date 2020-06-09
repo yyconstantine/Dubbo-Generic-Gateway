@@ -13,6 +13,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -36,6 +37,9 @@ public class ApiResourceLoader implements BeanPostProcessor {
     @SneakyThrows
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        if (StringUtils.isEmpty(this.propertyConfig.getScanPackages()) || "null".equals(this.propertyConfig.getScanPackages())) {
+            return bean;
+        }
         if (bean.getClass().getName().contains(Constants.GATEWAY_KEY)) {
             return bean;
         }

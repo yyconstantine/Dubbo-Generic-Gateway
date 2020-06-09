@@ -1,0 +1,3 @@
+nacos=me.sxl.gateway.registry.NacosApiRegistryStrategy
+redis=me.sxl.gateway.registry.RedisApiRegistryStrategy
+zookeeper=me.sxl.gateway.registry.ZookeeperApiRegistryStrategy

@@ -22,29 +22,33 @@ import java.util.Map;
 @Slf4j
 public class ReferenceConfigHandler {
 
-    private Map<DubboReferenceKey, DubboReferenceValue> configMap = new HashMap<>();
+    private final Map<DubboReferenceKey, DubboReferenceValue> configMap = new HashMap<>();
 
-    private ApiReferenceStrategy referenceStrategy = ExtensionLoader.getExtensionLoader(ApiReferenceStrategy.class).getAdaptiveExtension();
+    private final ExtensionLoader<ApiReferenceStrategy> extensionLoader = ExtensionLoader.getExtensionLoader(ApiReferenceStrategy.class);
 
     private Properties properties;
 
-    private ApplicationConfig application = new ApplicationConfig();
+    private final ApplicationConfig application = new ApplicationConfig();
 
     @Autowired
     public void setProperties(Properties properties) {
         this.properties = properties;
     }
 
+    private ApiReferenceStrategy getCustomExtension() {
+        return this.extensionLoader.getExtension(this.properties.getGatewayProperties().getReferenceProtocol());
+    }
+
     @PostConstruct
     public void init() {
         // 普通编码配置方式
-        application.setName(this.properties.getApplicationName());
+        application.setName(this.properties.getRpcProperties().getApplicationName());
 
         // 连接注册中心配置
-        for (Address addr : this.properties.getAddresses()) {
+        for (Address addr : this.properties.getRpcProperties().getAddresses()) {
             RegistryConfig registry = new RegistryConfig();
             registry.setAddress(addr.getAddress());
-            registry.setProtocol(this.properties.getProtocol());
+            registry.setProtocol(this.properties.getRpcProperties().getProtocol());
             application.setRegistry(registry);
         }
 
@@ -59,7 +63,7 @@ public class ReferenceConfigHandler {
     }
 
     public DubboReferenceValue putIfAbsent(DubboReferenceKey key) {
-        Map<Object, Object> apis = this.convert(this.referenceStrategy.reference());
+        Map<Object, Object> apis = this.convert(this.getCustomExtension().reference());
         if (CollectionUtils.isEmpty(apis)) {
             return null;
         }
@@ -83,7 +87,7 @@ public class ReferenceConfigHandler {
 
     private void putAll() {
         Map<Object, Object> apis;
-        apis = convert(this.referenceStrategy.reference());
+        apis = convert(this.getCustomExtension().reference());
         if (CollectionUtils.isEmpty(apis)) {
             return;
         }
@@ -135,7 +139,7 @@ public class ReferenceConfigHandler {
         reference.setGeneric(true);
         reference.setApplication(application);
         reference.setValidation("Validated");
-        reference.setLoadbalance(this.properties.getLoadBalance());
+        reference.setLoadbalance(this.properties.getRpcProperties().getLoadBalance());
         return reference;
     }
 

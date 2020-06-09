@@ -3,7 +3,7 @@ nacos:
     server-addr: 127.0.0.1:8848
 
 gateway:
-  scan-packages: me.sxl
+  scan-packages: me.sxl.order.facade
   loadbalance: RoundRobin
   registry:
     # 配置中心方式,默认nacos,可选redis/zookeeper

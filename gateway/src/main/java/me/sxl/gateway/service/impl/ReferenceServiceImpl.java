@@ -10,7 +10,6 @@ import org.apache.dubbo.rpc.service.GenericService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,13 +21,13 @@ public class ReferenceServiceImpl implements ReferenceService {
 
     private ReferenceConfigHandler handler;
 
-    @Resource
+    /*@Resource(name = "referenceConfigHandler")
     public void setHandler(ReferenceConfigHandler handler) {
         this.handler = handler;
-    }
+    }*/
 
     @Override
-    public Optional<DubboReferenceValue> findDubboReferenceBy(DubboReferenceKey key) throws IOException {
+    public Optional<DubboReferenceValue> findDubboReferenceBy(DubboReferenceKey key) {
         DubboReferenceValue config = this.handler.get(key);
         if (config == null) {
             config = this.handler.putIfAbsent(key);
