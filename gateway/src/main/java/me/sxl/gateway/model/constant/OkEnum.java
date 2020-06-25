@@ -12,8 +12,8 @@ public enum OkEnum {
     GLOBAL_UPDATE_OK(204, "修改成功"),
     GLOBAL_DELETE_OK(204, "删除成功");
 
-    private int code;
+    private final Integer code;
 
-    private String msg;
+    private final String msg;
 
 }

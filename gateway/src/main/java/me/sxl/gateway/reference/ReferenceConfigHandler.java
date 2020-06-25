@@ -24,7 +24,7 @@ public class ReferenceConfigHandler {
 
     private final Map<DubboReferenceKey, DubboReferenceValue> configMap = new HashMap<>();
 
-    private final ExtensionLoader<ApiReferenceStrategy> extensionLoader = ExtensionLoader.getExtensionLoader(ApiReferenceStrategy.class);
+    private ExtensionLoader<ApiReferenceStrategy> extensionLoader;
 
     private Properties properties;
 
@@ -36,7 +36,10 @@ public class ReferenceConfigHandler {
     }
 
     private ApiReferenceStrategy getCustomExtension() {
-        return this.extensionLoader.getExtension(this.properties.getGatewayProperties().getReferenceProtocol());
+        if (extensionLoader == null) {
+            extensionLoader = ExtensionLoader.getExtensionLoader(ApiReferenceStrategy.class);
+        }
+        return extensionLoader.getExtension(this.properties.getGatewayProperties().getReferenceProtocol());
     }
 
     @PostConstruct

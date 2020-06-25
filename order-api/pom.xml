@@ -6,29 +6,17 @@
         <groupId>me.sxl</groupId>
         <artifactId>dependencies</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../dependencies</relativePath>
+        <relativePath>../dependencies/pom.xml</relativePath>
     </parent>
     <artifactId>order-api</artifactId>
-    <version>${project.version}</version>
-    <properties>
-        <java.version>1.8</java.version>
-    </properties>
+    <version>0.0.1-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
             <groupId>me.sxl</groupId>
             <artifactId>gateway</artifactId>
-            <version>${project.version}</version>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

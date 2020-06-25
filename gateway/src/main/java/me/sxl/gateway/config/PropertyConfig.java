@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
  * @author yyconstantine
  * @date 2020/5/15 上午 11:47
  */
-@Configuration
+@Configuration("propertyConfig")
 @EnableConfigurationProperties({RegistryCenterConfig.class})
 @Getter
 public class PropertyConfig {

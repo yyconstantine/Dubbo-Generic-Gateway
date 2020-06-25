@@ -6,23 +6,20 @@
         <groupId>me.sxl</groupId>
         <artifactId>dependencies</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../dependencies</relativePath>
+<!--        <relativePath>../dependencies</relativePath>-->
     </parent>
     <artifactId>gateway</artifactId>
-    <version>${project.version}</version>
-
-    <properties>
-        <java.version>1.8</java.version>
-    </properties>
-
-    <dependencies>
-    </dependencies>
+    <version>0.0.1-SNAPSHOT</version>
 
     <build>
+        <finalName>gateway</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>me.sxl.gateway.GatewayApplication</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>

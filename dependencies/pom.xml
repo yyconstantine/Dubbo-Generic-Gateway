@@ -25,7 +25,6 @@
         <dubbo.version>2.7.3</dubbo.version>
         <swagger.version>2.9.2</swagger.version>
         <zookeeper.version>0.11</zookeeper.version>
-        <mybatis.version>1.3.2</mybatis.version>
         <nacos.verion>0.2.7</nacos.verion>
     </properties>
 

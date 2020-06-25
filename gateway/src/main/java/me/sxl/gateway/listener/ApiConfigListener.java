@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import me.sxl.gateway.reference.ReferenceConfigHandler;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.Resource;
+
 /**
  * @author yyconstantine
  * @date 2020/5/14 上午 11:33
@@ -20,10 +22,10 @@ public class ApiConfigListener {
 
     private ReferenceConfigHandler handler;
 
-    /*@Resource(name = "referenceConfigHandler")
+    @Resource(name = "referenceConfigHandler")
     public void setHandler(ReferenceConfigHandler handler) {
         this.handler = handler;
-    }*/
+    }
 
     @NacosConfigListener(dataId = "${gateway.nacos-data:testData}", groupId = "${gateway.nacos-group:testGroup}")
     public void onMessage(String config) {

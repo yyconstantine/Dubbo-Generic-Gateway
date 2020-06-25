@@ -10,12 +10,12 @@ gateway:
     protocol: nacos
     nacos-data: testData
     nacos-group: testGroup
-#    protocol: redis
-#    protocol: zookeeper
+    #    protocol: redis
+    #    protocol: zookeeper
     # dubbo注册中心配置,暂时只支持zookeeper
-    addrs:
-      - id: zk1
-        address: 127.0.0.1:2181
+#    addrs:
+#      - id: zk1
+#        address: 127.0.0.1:2181
 #      - id: zk2
 #        address: 127.0.0.1:2182
 #      - id: zk3

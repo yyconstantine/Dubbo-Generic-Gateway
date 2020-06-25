@@ -18,8 +18,8 @@ public enum  ErrorEnum {
 
     REQ_DECODE_ERROR(10001, "参数解析错误");
 
-    private int code;
+    private final Integer code;
 
-    private String msg;
+    private final String msg;
 
 }
